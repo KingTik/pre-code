@@ -1,0 +1,120 @@
+#!/usr/bin/env python
+import os
+import sys
+
+def make_makefile():
+    makefile = open('makefile', "w+")
+    makefile.write("all:\n")
+    makefile.write("clean:")
+    makefile.close()
+
+cpp_file_content = '''#include <iostream>
+#include <algorithm>
+#include <vector>
+
+namespace tw{
+    template <typename T> void print(const T &list);
+}
+
+int main(int argc, char** argv){
+    std::vector<std::string> arguments(argv, argv+argc);
+
+}
+
+
+namespace tw{
+    template <typename T>
+    void print(const T &list)
+    {
+        auto start = std::begin(list);
+        auto end = std::end(list);
+        if(start != end) { 
+            std::cout << "[";
+            std::for_each(start, --end, [](auto element){
+                std::cout << element << ", ";
+            });
+
+            std::cout << *end << "]" <<std::endl;
+        }else{
+            std::cout <<"[]" <<std::endl;
+        }
+    }
+}
+
+
+'''
+
+c_file_content='''#include <stdio.h>
+#include <string.h>
+
+
+
+int main(int argc, char** argv){
+  
+
+}
+
+'''
+
+if len(sys.argv) > 1:
+
+    
+    new_cpp_file = sys.argv[1].strip()
+    for element in os.listdir(os.getcwd()):
+        if os.path.isfile(os.path.join(os.getcwd(),element)):
+            if element == new_cpp_file:
+                sys.exit("You have that file already, jesus who do i work with")
+
+    if new_cpp_file.find('.') < 0:
+        sys.exit("What is this? Give me a proper file idiot")
+
+    #Lets check what file type we're dealing with
+    compiler = ''
+    file_content = ''
+    if new_cpp_file.endswith('.cpp'): #oh, its a cpp file!
+        compiler = 'g++ -std=c++17'
+        file_content = cpp_file_content
+    elif new_cpp_file.endswith('.c'): #oh, its a c file!
+        compiler = 'gcc'
+        file_content = c_file_content
+    else:
+        sys.exit("I can't handle this shity file format!") #oh, its a shit file!
+
+    #file name withot extension
+    just_name = new_cpp_file[0:new_cpp_file.find('.')]
+
+    # create and fill file
+    new_cpp_file_handle = open(new_cpp_file, "w+")
+    new_cpp_file_handle.write(file_content)
+    new_cpp_file_handle.close()
+
+    # check for makefile
+    if not os.path.isfile('makefile'):
+        make_makefile()
+        
+
+    #add new file to makefile
+    with open('makefile', "a") as makefile_handler:
+        makefile_handler.write('\n')
+        makefile_handler.write(just_name)
+        makefile_handler.write(': ')
+        makefile_handler.write(new_cpp_file)
+        makefile_handler.write("\n\t"+compiler+" -o ")
+        makefile_handler.write(just_name)
+        makefile_handler.write(" ")
+        makefile_handler.write(new_cpp_file)
+
+    all_line = ""
+    with open('makefile', 'r') as makefile_handler:
+        makefile_handler.seek(0,0)
+        
+        all_line = makefile_handler.readline()
+
+    
+    lines = open('makefile').read().splitlines()
+    lines[0] = lines[0]+" " + just_name
+    
+    open('makefile','w').write('\n'.join(lines))            
+
+else: 
+    print "Give me a name, moron"
