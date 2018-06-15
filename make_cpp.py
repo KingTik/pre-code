@@ -59,32 +59,33 @@ int main(int argc, char** argv){
 if len(sys.argv) > 1:
 
     
-    new_cpp_file = sys.argv[1].strip()
+    
+    new_code_file = sys.argv[1].strip()
     for element in os.listdir(os.getcwd()):
         if os.path.isfile(os.path.join(os.getcwd(),element)):
-            if element == new_cpp_file:
+            if element == new_code_file:
                 sys.exit("You have that file already, jesus who do i work with")
 
-    if new_cpp_file.find('.') < 0:
+    if new_code_file.find('.') < 0:
         sys.exit("What is this? Give me a proper file idiot")
 
     #Lets check what file type we're dealing with
     compiler = ''
     file_content = ''
-    if new_cpp_file.endswith('.cpp'): #oh, its a cpp file!
+    if new_code_file.endswith('.cpp'): #oh, its a cpp file!
         compiler = 'g++ -std=c++17'
         file_content = cpp_file_content
-    elif new_cpp_file.endswith('.c'): #oh, its a c file!
+    elif new_code_file.endswith('.c'): #oh, its a c file!
         compiler = 'gcc'
         file_content = c_file_content
     else:
         sys.exit("I can't handle this shity file format!") #oh, its a shit file!
 
     #file name withot extension
-    just_name = new_cpp_file[0:new_cpp_file.find('.')]
+    just_name = new_code_file[0:new_code_file.find('.')]
 
     # create and fill file
-    new_cpp_file_handle = open(new_cpp_file, "w+")
+    new_cpp_file_handle = open(new_code_file, "w+")
     new_cpp_file_handle.write(file_content)
     new_cpp_file_handle.close()
 
@@ -98,18 +99,18 @@ if len(sys.argv) > 1:
         all_lines = makefile_handler.readlines()
         for line in all_lines:
             if line.strip().startswith(just_name+':'):
-                just_name+='-'+new_cpp_file[new_cpp_file.find('.')+1:]
+                just_name+='-'+new_code_file[new_code_file.find('.')+1:]
 
     #add new file to makefile
     with open('makefile', "a") as makefile_handler:
         makefile_handler.write('\n')
         makefile_handler.write(just_name)
         makefile_handler.write(': ')
-        makefile_handler.write(new_cpp_file)
+        makefile_handler.write(new_code_file)
         makefile_handler.write("\n\t"+compiler+" -o ")
         makefile_handler.write(just_name)
         makefile_handler.write(" ")
-        makefile_handler.write(new_cpp_file)
+        makefile_handler.write(new_code_file)
 
 # got to add clean procedure to makefile
 
