@@ -92,6 +92,13 @@ if len(sys.argv) > 1:
     if not os.path.isfile('makefile'):
         make_makefile()
         
+    #Lets check if we already have something like that in makefile
+    #for example if we have test.cpp and test.c would get 'test: ' in makefile 
+    with open('makefile', 'r') as makefile_handler:
+        all_lines = makefile_handler.readlines()
+        for line in all_lines:
+            if line.strip().startswith(just_name+':'):
+                just_name+='-'+new_cpp_file[new_cpp_file.find('.')+1:]
 
     #add new file to makefile
     with open('makefile', "a") as makefile_handler:
@@ -104,11 +111,8 @@ if len(sys.argv) > 1:
         makefile_handler.write(" ")
         makefile_handler.write(new_cpp_file)
 
-    all_line = ""
-    with open('makefile', 'r') as makefile_handler:
-        makefile_handler.seek(0,0)
-        
-        all_line = makefile_handler.readline()
+# got to add clean procedure to makefile
+
 
     
     lines = open('makefile').read().splitlines()
