@@ -11,9 +11,14 @@ def make_makefile():
 cpp_file_content = '''#include <iostream>
 #include <algorithm>
 #include <vector>
+#include <functional>
+#include <chrono>
 
 namespace tw{
     template <typename T> void print(const T &list);
+    template<typename TimeScale = std::chrono::milliseconds>
+    auto benchmark(std::function<void(void)> tested_function) 
+        -> decltype(std::chrono::duration_cast<TimeScale>(static_cast<std::chrono::duration<int>>(0)).count());
 }
 
 int main(int argc, char** argv){
@@ -38,6 +43,20 @@ namespace tw{
         }else{
             std::cout <<"[]" <<std::endl;
         }
+    }
+
+
+    template<typename TimeScale = std::chrono::milliseconds>
+    auto benchmark(std::function<void(void)> tested_function) 
+        -> decltype(std::chrono::duration_cast<TimeScale>(static_cast<std::chrono::duration<int>>(0)).count())
+    {
+        auto start = std::chrono::system_clock::now();
+
+        tested_function();
+
+        auto end = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<TimeScale>(end - start);
+        return elapsed.count();
     }
 }
 
